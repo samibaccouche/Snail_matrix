@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlgoSuite: Snail & Sequence</title>
+    <style>
+      :root {
+        --primary: #6366f1;
+        --secondary: #ec4899;
+        --bg: #0f172a;
+        --glass: rgba(255, 255, 255, 0.05);
+        --text: #f8fafc;
+      }
+
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        overflow-x: hidden;
+      }
+
+      .card {
+        background: var(--glass);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 2.5rem;
+        border-radius: 24px;
+        width: 90%;
+        max-width: 550px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      h1 {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        background: linear-gradient(to right, #818cf8, #f472b6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 5px;
+        border-radius: 14px;
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+        background: transparent;
+        color: #94a3b8;
+        font-weight: 600;
+      }
+      .tab-btn.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      }
+
+      .content-panel {
+        display: none;
+        animation: fadeIn 0.4s ease;
+      }
+      .content-panel.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      label {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      input {
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.3s;
+      }
+      input:focus {
+        border-color: var(--primary);
+      }
+
+      .action-btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          opacity 0.2s;
+        margin-top: 10px;
+      }
+      .action-btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+      }
+      .action-btn:active {
+        transform: translateY(0);
+      }
+
+      .result-area {
+        margin-top: 25px;
+        padding: 15px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        min-height: 50px;
+        word-wrap: break-word;
+        font-family: "Fira Code", monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .matrix-preview {
+        display: grid;
+        gap: 6px;
+        margin: 15px auto;
+        max-width: fit-content;
+      }
+      .matrix-cell {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>AlgoSuite</h1>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('snail')">
+          Snail Matrix
+        </button>
+        <button class="tab-btn" onclick="switchTab('sequence')">
+          Consecutive
+        </button>
+      </div>
+
+      <div id="snail-panel" class="content-panel active">
+        <div class="input-group">
+          <label>Matrix Dimension (n)</label>
+          <input
+            type="number"
+            id="matrixSize"
+            value="3"
+            min="1"
+            max="10"
+            oninput="drawMatrix()"
+          />
+        </div>
+        <div id="matrixVisual" class="matrix-preview"></div>
+        <button class="action-btn" onclick="runSnail()">Generate Spiral</button>
+        <div id="snailResult" class="result-area">Path will appear here...</div>
+      </div>
+
+      <div id="sequence-panel" class="content-panel">
+        <div class="input-group">
+          <label>Numeric String</label>
+          <input
+            type="text"
+            id="seqInput"
+            placeholder="e.g. 99100101"
+            autocomplete="off"
+          />
+        </div>
+        <button class="action-btn" onclick="runSequence()">
+          Check Validity
+        </button>
+        <div id="seqResult" class="result-area">Enter a number to start...</div>
+      </div>
+    </div>
+
+    <script>
+      // --- Tab Switching ---
+      function switchTab(type) {
+        document
+          .querySelectorAll(".content-panel")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+
+        document.getElementById(type + "-panel").classList.add("active");
+        event.currentTarget.classList.add("active");
+      }
+
+      // --- Snail Logic ---
+      function drawMatrix() {
+        const n = parseInt(document.getElementById("matrixSize").value) || 1;
+        const grid = document.getElementById("matrixVisual");
+        grid.style.gridTemplateColumns = `repeat(${n}, 45px)`;
+        grid.innerHTML = "";
+
+        for (let i = 1; i <= n * n; i++) {
+          const cell = document.createElement("div");
+          cell.className = "matrix-cell";
+          cell.innerText = i;
+          grid.appendChild(cell);
+        }
+      }
+
+      function runSnail() {
+        const n = parseInt(document.getElementById("matrixSize").value);
+        if (n < 1) return;
+
+        // Generate Matrix Data
+        let matrix = [];
+        let val = 1;
+        for (let i = 0; i < n; i++) {
+          let row = [];
+          for (let j = 0; j < n; j++) row.push(val++);
+          matrix.push(row);
+        }
+
+        // Spiral Algorithm
+        let result = [];
+        let top = 0,
+          bottom = n - 1,
+          left = 0,
+          right = n - 1;
+
+        while (top <= bottom && left <= right) {
+          for (let i = left; i <= right; i++) result.push(matrix[top][i]);
+          top++;
+          for (let i = top; i <= bottom; i++) result.push(matrix[i][right]);
+          right--;
+          if (top <= bottom) {
+            for (let i = right; i >= left; i--) result.push(matrix[bottom][i]);
+            bottom--;
+          }
+          if (left <= right) {
+            for (let i = bottom; i >= top; i--) result.push(matrix[i][left]);
+            left++;
+          }
+        }
+        document.getElementById("snailResult").innerHTML =
+          `<strong>Path:</strong><br>${result.join(" ➔ ")}`;
+      }
+
+      // --- Consecutive Numbers Logic ---
+      function runSequence() {
+        const str = document.getElementById("seqInput").value.trim();
+        const display = document.getElementById("seqResult");
+        const n = str.length;
+
+        if (n < 2) {
+          display.innerHTML = "❌ String too short for a split.";
+          return;
+        }
+
+        let found = false;
+        let finalPath = [];
+
+        // Try starting lengths from 1 to n/2
+        for (let len = 1; len <= Math.floor(n / 2); len++) {
+          let firstPart = str.substring(0, len);
+
+          // Rule: No leading zeros
+          if (firstPart.length > 1 && firstPart[0] === "0") continue;
+
+          let currentNum = BigInt(firstPart);
+          let builtStr = firstPart;
+          let path = [firstPart];
+
+          // Safety check: only loop while builtStr is smaller than original
+          while (builtStr.length < n) {
+            currentNum++;
+            let nextStr = currentNum.toString();
+            builtStr += nextStr;
+            path.push(nextStr);
+          }
+
+          if (builtStr === str) {
+            found = true;
+            finalPath = path;
+            break;
+          }
+        }
+
+        if (found) {
+          display.innerHTML = `✅ <strong>Valid!</strong><br><span style="color: #4ade80">${finalPath.join(" ➔ ")}</span>`;
+        } else {
+          display.innerHTML = `<span style="color: #f87171">❌ Invalid sequence split.</span>`;
+        }
+      }
+
+      // Initialize
+      drawMatrix();
+    </script>
+  </body>
+</html>
